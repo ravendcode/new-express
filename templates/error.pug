@@ -1,0 +1,10 @@
+extends base.pug
+
+block title
+  title #{locals.app.name} - #{error.type}
+
+block content
+  h1 #{error.type} - #{error.message}
+  if error.stack
+    p
+      code= error.stack

@@ -1,0 +1,56 @@
+{
+  "name": "new-express",
+  "version": "1.0.0",
+  "main": "./src/index.js",
+  "author": "ravend <ravendcode@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": "^11.1.0"
+  },
+  "scripts": {
+    "start": "export NODE_ENV=production || set NODE_ENV=production&& yarn build && node dist",
+    "dev": "export DEBUG=app:* || set DEBUG=app:* && nodemon src --exec babel-node -e js,hbs,pug",
+    "build": "yarn run clean && babel src -d dist -s --ignore spec.js,test.js",
+    "clean": "rimraf ./dist",
+    "test:jest": "nodemon --watch src --exec jest",
+    "test:mocha": "nodemon --watch src --exec mocha --require babel-register src/**/*.spec.js",
+    "test": "export NODE_ENV=test || set NODE_ENV=test&& yarn test:jest"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ],
+      "stage-2"
+    ]
+  },
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "body-parser": "^1.18.3",
+    "dotenv": "^6.1.0",
+    "express": "^4.16.4",
+    "express-rate-limit": "^3.2.1",
+    "jsonwebtoken": "^8.3.0",
+    "morgan": "^1.9.1",
+    "pug": "^2.0.3",
+    "rimraf": "^2.6.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "babel-register": "^6.26.0",
+    "eslint": "^5.7.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-html": "^4.0.6",
+    "eslint-plugin-import": "^2.14.0",
+    "jest": "^23.6.0",
+    "mocha": "^5.2.0",
+    "supertest": "^3.3.0"
+  }
+}
