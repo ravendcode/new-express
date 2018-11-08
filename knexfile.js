@@ -5,7 +5,7 @@ dotenv.load();
 
 const options = {
   client: 'mysql',
-  connection: process.env.NODE_ENV === 'test' ? process.env.DATABASE_URL + '_test' : process.env.DATABASE_URL,
+  connection: process.env.DATABASE_URL,
   debug: process.env.NODE_ENV === 'development',
   pool: {
     min: 2,
@@ -31,6 +31,7 @@ module.exports = {
   },
   test: {
     ...options,
+    connection: process.env.DATABASE_URL + '_test',
   },
   production: {
     ...options,

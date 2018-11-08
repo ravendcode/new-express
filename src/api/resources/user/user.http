@@ -14,7 +14,7 @@ content-type: application/json
 ###
 GET {{host}}/1
 ###
-PATCH {{host}}/47
+PATCH {{host}}/49
 content-type: application/json
 
 {

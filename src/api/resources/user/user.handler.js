@@ -53,7 +53,7 @@ export default {
       const id = (await req.knex('users').insert(newUser))[0];
       const token = await jwt.sign({ id }, process.env.SECRET_KEY);
       await req.knex('users').where('id', id).update({ access_token: token });
-      const user = await req.knex('users').where('id', id);
+      const user = (await req.knex('users').where('id', id))[0];
       res.status(201);
       res.send({ ...user });
     } catch (err) {

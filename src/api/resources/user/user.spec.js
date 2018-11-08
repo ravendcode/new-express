@@ -1,22 +1,27 @@
 import request from 'supertest';
 import app from '../../../app';
+import knex from '../../../databases/connections/knex';
+import dbMigrate from '../../../helpers';
 
 const url = '/api/user';
 const param = '1';
 const urlParam = `${url}/${param}`;
 
 describe('API', () => {
+  dbMigrate(knex);
+
   describe(`GET ${url}`, () => {
     test('should respond status and data', async () => {
       const res = await request(app).get(url);
       expect(res.status).toEqual(200);
-      // expect(res.body.message).toEqual('getAll');
+      expect(res.body).toHaveProperty('users');
     });
   });
   describe(`POST ${url}`, () => {
     test('should respond status and data', async () => {
       const data = {
-        username: 'Test',
+        name: 'test',
+        email: 'test@email.com',
         password: 'qwerty',
       };
       const res = await request(app)
@@ -25,8 +30,8 @@ describe('API', () => {
         .set('Accept', 'application/json')
         .send(data);
       expect(res.status).toEqual(201);
-      expect(res.body.username).toEqual(data.username);
-      expect(res.body.password).toEqual(data.password);
+      expect(res.body.name).toEqual(data.name);
+      expect(res.body.email).toEqual(data.email);
     });
   });
   describe(`GET ${urlParam}`, () => {
@@ -39,7 +44,7 @@ describe('API', () => {
   describe(`PATCH ${urlParam}`, () => {
     test('should respond status and data', async () => {
       const data = {
-        username: 'Bob',
+        name: 'test',
       };
       const res = await request(app)
         .patch(urlParam)
@@ -47,9 +52,8 @@ describe('API', () => {
         .set('Accept', 'application/json')
         .send(data);
       expect(res.status).toEqual(201);
-      expect(res.body.data).toEqual('updateOne');
-      // expect(res.body.data).toHaveProperty('username');
-      // expect(res.body.data).toEqual(data);
+      expect(res.body).toHaveProperty('name');
+      expect(res.body.name).toEqual(data.name);
     });
   });
   describe(`DELETE ${urlParam}`, () => {
