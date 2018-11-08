@@ -24,10 +24,10 @@ export const jwtMdw = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
     const bearerToken = token.replace('Bearer ', '');
-    if (process.env.JWT_SECRET === undefined) {
-      res.throw(500, 'JWT_SECRET is undefined');
+    if (process.env.SECRET_KEY === undefined) {
+      res.throw(500, 'SECRET_KEY is undefined');
     }
-    const decode = await jwt.verify(bearerToken, process.env.JWT_SECRET);
+    const decode = await jwt.verify(bearerToken, process.env.SECRET_KEY);
 
     const user = users.find(element => element.id === decode.id && element.accessToken === bearerToken);
 

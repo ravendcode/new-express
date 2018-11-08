@@ -22,6 +22,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use(require('./middleware/throw').default);
+app.use(require('./middleware/knex').default);
 
 app.set('views', config.templatesDir);
 app.set('view engine', 'pug');

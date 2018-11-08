@@ -7,20 +7,22 @@ POST {{host}}
 content-type: application/json
 
 {
-  "username": "Bob",
+  "name": "12lol",
+  "email": "12lol@email.com",
   "password": "qwerty"
 }
 ###
 GET {{host}}/1
 ###
-PATCH {{host}}/1
+PATCH {{host}}/47
 content-type: application/json
 
 {
-  "username": "Bob"
+  "name": "lol",
+  "email": "lol@email.com"
 }
 ###
-DELETE {{host}}/1
+DELETE {{host}}/47
 ###
 GET http://localhost:3000/api/me
 Authorization: Bearer {{token}}

@@ -1,38 +1,61 @@
 import jwt from 'jsonwebtoken';
-
-import users from './user.model';
+import bcrypt from 'bcrypt';
+import User from './user.model';
 
 export default {
-  findByParam(req, res, next, id) {
-    const intId = parseInt(id, 10);
-    const user = users.find(element => element.id === intId);
-    if (user) {
-      req.user = user;
-      return next();
+  async findByParam(req, res, next, id) {
+    try {
+      const intId = parseInt(id, 10);
+      if (!intId) {
+        return res.throw(404);
+      }
+      const user = await User.findById(req, intId);
+      if (user.length) {
+        [req.user] = user;
+        return next();
+      }
+      return res.throw(404);
+    } catch (err) {
+      return next(err);
     }
-    return res.throw(404);
   },
-  getAll(req, res) {
-    res.send({ users });
+  async getAll(req, res, next) {
+    try {
+      const users = await User.findAll(req);
+      res.send({ users });
+    } catch (err) {
+      next(err);
+    }
   },
   async createOne(req, res, next) {
     try {
-      const newUser = {};
-      newUser.id = users.length + 1;
-      newUser.username = req.body.username;
-      newUser.password = req.body.password;
-      newUser.email = req.body.email;
-      if (process.env.JWT_SECRET === undefined) {
-        res.throw(500, 'JWT_SECRET is undefined');
+      const newUser = {
+        name: req.body.name,
+        email: req.body.email,
+      };
+      if (process.env.SECRET_KEY === undefined) {
+        res.throw(500, 'SECRET_KEY is undefined');
       }
-      const token = await jwt.sign({ id: newUser.id }, process.env.JWT_SECRET);
-      newUser.accessToken = token;
-      if (users.find(element => element.username === req.body.username)) {
-        res.throw(422, { username: `${req.body.username} already taken` });
+      if (process.env.SALT_ROUNDS === undefined) {
+        res.throw(500, 'SALT_ROUNDS is undefined');
       }
-      users.push(newUser);
+      const nameR = await req.knex('users').where('name', req.body.name);
+      if (nameR.length) {
+        res.throw(422, { name: `${req.body.name} already taken` });
+      }
+      const emailR = await req.knex('users').where('email', req.body.email);
+      if (emailR.length) {
+        res.throw(422, { email: `${req.body.email} already taken` });
+      }
+      const saltRounds = parseInt(process.env.SALT_ROUNDS, 10);
+      const password = await bcrypt.hash(req.body.password, saltRounds);
+      newUser.password = password;
+      const id = (await req.knex('users').insert(newUser))[0];
+      const token = await jwt.sign({ id }, process.env.SECRET_KEY);
+      await req.knex('users').where('id', id).update({ access_token: token });
+      const user = await req.knex('users').where('id', id);
       res.status(201);
-      res.send({ ...newUser });
+      res.send({ ...user });
     } catch (err) {
       next(err);
     }
@@ -40,10 +63,22 @@ export default {
   getOne(req, res) {
     res.send(req.user);
   },
-  updateOne(req, res) {
-    res.status(201).send({ data: 'updateOne' });
+  async updateOne(req, res, next) {
+    try {
+      await User.update(req, req.user.id, req.body);
+      const user = (await User.findById(req, req.user.id))[0];
+      res.status(201);
+      res.send(user);
+    } catch (err) {
+      next(err);
+    }
   },
-  deleteOne(req, res) {
-    res.status(204).send();
+  async deleteOne(req, res, next) {
+    try {
+      await User.delById(req, req.user.id);
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
+    }
   },
 };
