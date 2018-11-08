@@ -4,6 +4,7 @@
 
 * Good project structure
 * MySQL (knex)
+* JWT Auth
 * Tests
 
 ## Usage
